@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import './style.css';
 
 async function api(path = '', options = {}) {
@@ -58,6 +60,23 @@ function App() {
     } catch (e) { setError(e.message); }
     finally { setSaving(false); }
   }
+  async function confirmDelete(todo) {
+    const result = await Swal.fire({
+      title: 'Delete this task?',
+      text: `“${todo.title}” will be permanently deleted.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete task',
+      cancelButtonText: 'Keep task',
+      confirmButtonColor: '#94604e',
+      cancelButtonColor: '#566850',
+      focusCancel: true,
+      reverseButtons: true,
+      customClass: { popup: 'delete-dialog' },
+    });
+    if (result.isConfirmed) await mutate(todo, 'delete');
+  }
+
   async function mutate(todo, action) {
     if (locks.current.has(todo._id)) return;
     locks.current.add(todo._id); setBusy(new Set(locks.current)); setError('');
@@ -88,7 +107,7 @@ function App() {
         <section className="tasks" aria-labelledby="tasks-heading"><div className="tasks-heading"><div><h2 id="tasks-heading">Your tasks <span className="count">{todos.length}</span></h2><p className="muted">{completed ? `${completed} of ${todos.length} completed` : 'No tasks completed yet'}</p></div><span className="progress-number">{todos.length ? Math.round(completed / todos.length * 100) : 0}%<small>COMPLETE</small></span></div><div className="progress" role="progressbar" aria-label="Tasks completed" aria-valuenow={completed} aria-valuemin={0} aria-valuemax={todos.length || 1}><div style={{ width: `${todos.length ? completed / todos.length * 100 : 0}%` }}/></div>
           <div className="tools"><div className="filters" aria-label="Filter tasks">{['All', 'Active', 'Completed'].map(f => <button key={f} aria-pressed={filter === f} className={filter === f ? 'selected' : ''} onClick={() => setFilter(f)}>{f}</button>)}</div><input className="search" type="search" aria-label="Search tasks" placeholder="Search tasks…" value={search} onChange={e => setSearch(e.target.value)}/></div>
           {error && <div role="alert" className="error">{error}<button onClick={load} disabled={loading || busy.size > 0 || saving}>Refresh list</button></div>}
-          {loading ? <div className="empty" role="status">Loading your tasks…</div> : visible.length ? <ul className="task-list">{visible.map(todo => <li key={todo._id} className={`task ${todo.done ? 'done' : ''} ${editing === todo._id ? 'is-editing' : ''}`} aria-busy={busy.has(todo._id)}><input type="checkbox" className="checkbox" aria-label={`Mark ${todo.title} ${todo.done ? 'undone' : 'done'}`} checked={todo.done} disabled={busy.has(todo._id) || editing === todo._id} onChange={() => mutate(todo, 'toggle')}/><div className="task-copy"><h3>{todo.title}</h3>{todo.description && <p>{todo.description}</p>}<span className="task-tag">{todo.done ? 'Completed' : 'To do'}</span></div><div className="actions"><button aria-label={`Edit ${todo.title}`} disabled={saving || busy.has(todo._id)} onClick={() => { setEditing(todo._id); setTitle(todo.title); setDescription(todo.description); titleInput.current?.focus(); }}>Edit</button><button className="delete" aria-label={`Delete ${todo.title}`} disabled={saving || busy.has(todo._id)} onClick={() => { if (window.confirm(`Delete “${todo.title}”?`)) mutate(todo, 'delete'); }}>Delete</button></div></li>)}</ul> : <div className="empty"><div className="empty-icon">✓</div><h3>{search ? 'No matching tasks' : filter === 'Completed' ? 'No completed tasks yet' : filter === 'Active' && todos.length ? 'All done for now' : 'No tasks yet'}</h3><p>{search ? 'Try another search or clear the search box.' : filter === 'Completed' ? 'Tasks you mark done will appear here.' : filter === 'Active' && todos.length ? 'You’ve finished everything on your list.' : 'Add your first task using the form.'}</p></div>}
+          {loading ? <div className="empty" role="status">Loading your tasks…</div> : visible.length ? <ul className="task-list">{visible.map(todo => <li key={todo._id} className={`task ${todo.done ? 'done' : ''} ${editing === todo._id ? 'is-editing' : ''}`} aria-busy={busy.has(todo._id)}><input type="checkbox" className="checkbox" aria-label={`Mark ${todo.title} ${todo.done ? 'undone' : 'done'}`} checked={todo.done} disabled={busy.has(todo._id) || editing === todo._id} onChange={() => mutate(todo, 'toggle')}/><div className="task-copy"><h3>{todo.title}</h3>{todo.description && <p>{todo.description}</p>}<span className="task-tag">{todo.done ? 'Completed' : 'To do'}</span></div><div className="actions"><button aria-label={`Edit ${todo.title}`} disabled={saving || busy.has(todo._id)} onClick={() => { setEditing(todo._id); setTitle(todo.title); setDescription(todo.description); titleInput.current?.focus(); }}>Edit</button><button className="delete" aria-label={`Delete ${todo.title}`} disabled={saving || busy.has(todo._id)} onClick={() => confirmDelete(todo)}>Delete</button></div></li>)}</ul> : <div className="empty"><div className="empty-icon">✓</div><h3>{search ? 'No matching tasks' : filter === 'Completed' ? 'No completed tasks yet' : filter === 'Active' && todos.length ? 'All done for now' : 'No tasks yet'}</h3><p>{search ? 'Try another search or clear the search box.' : filter === 'Completed' ? 'Tasks you mark done will appear here.' : filter === 'Active' && todos.length ? 'You’ve finished everything on your list.' : 'Add your first task using the form.'}</p></div>}
           <div className="list-footer"><span>{todos.length - completed} remaining</span><span>{visible.length} shown</span></div>
         </section>
       </div>

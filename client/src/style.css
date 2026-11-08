@@ -129,3 +129,8 @@ input:not([type=checkbox]):focus, textarea:focus { border-color: #618052; box-sh
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+.delete-dialog { font-family: inherit; border-radius: 10px; }
+.delete-dialog .swal2-title { font-size: 24px; font-weight: 600; color: #29352f; }
+.delete-dialog .swal2-html-container { font-size: 15px; color: #647064; overflow-wrap: anywhere; }
+.delete-dialog .swal2-styled { font-family: inherit; font-size: 14px; border-radius: 5px; }

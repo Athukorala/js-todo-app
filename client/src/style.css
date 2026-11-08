@@ -5,7 +5,14 @@
   font-synthesis: none;
 }
 * { box-sizing: border-box; }
-body { margin: 0; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 0% 0%, #dfe9d9 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, #e5eadd 0%, transparent 50%),
+    linear-gradient(135deg, #f5f7f1, #f8f7f2);
+}
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .5; }
@@ -134,3 +141,6 @@ input:not([type=checkbox]):focus, textarea:focus { border-color: #618052; box-sh
 .delete-dialog .swal2-title { font-size: 24px; font-weight: 600; color: #29352f; }
 .delete-dialog .swal2-html-container { font-size: 15px; color: #647064; overflow-wrap: anywhere; }
 .delete-dialog .swal2-styled { font-family: inherit; font-size: 14px; border-radius: 5px; }
+
+.task-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 10px; }
+.task-date { color: #6c7964; font-size: 11px; line-height: 1.5; }

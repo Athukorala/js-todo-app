@@ -20,6 +20,27 @@ async function api(path = '', options = {}) {
   return data;
 }
 
+const createdDateFormatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+});
+
+// Show the saved timestamp in the visitor's local time.
+function formatCreatedDate(value) {
+  const date = new Date(value);
+  if (!value || Number.isNaN(date.getTime())) return null;
+  const parts = Object.fromEntries(
+    createdDateFormatter
+      .formatToParts(date)
+      .map(({ type, value }) => [type, value]),
+  );
+  return `${parts.year} ${parts.month} ${parts.day} . ${parts.hour}:${parts.minute} ${parts.dayPeriod.toLowerCase()}`;
+}
+
 function App() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -329,23 +350,32 @@ function App() {
                     <div className="task-copy">
                       <h3>{todo.title}</h3>
                       {todo.description && <p>{todo.description}</p>}
-                      <span className="task-tag">
-                        {todo.done ? 'Completed' : 'To do'}
-                      </span>
+                      <div className="task-meta">
+                        <span className="task-tag">
+                          {todo.done ? 'Completed' : 'To do'}
+                        </span>
+                        {formatCreatedDate(todo.createdAt) && (
+                          <time className="task-date" dateTime={todo.createdAt}>
+                            Created {formatCreatedDate(todo.createdAt)}
+                          </time>
+                        )}
+                      </div>
                     </div>
                     <div className="actions">
-                      <button
-                        aria-label={`Edit ${todo.title}`}
-                        disabled={saving || busy.has(todo._id)}
-                        onClick={() => {
-                          setEditing(todo._id);
-                          setTitle(todo.title);
-                          setDescription(todo.description);
-                          titleInput.current?.focus();
-                        }}
-                      >
-                        Edit
-                      </button>
+                      {!todo.done && (
+                        <button
+                          aria-label={`Edit ${todo.title}`}
+                          disabled={saving || busy.has(todo._id)}
+                          onClick={() => {
+                            setEditing(todo._id);
+                            setTitle(todo.title);
+                            setDescription(todo.description);
+                            titleInput.current?.focus();
+                          }}
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button
                         className="delete"
                         aria-label={`Delete ${todo.title}`}

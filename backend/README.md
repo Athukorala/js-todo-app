@@ -1,43 +1,77 @@
 # Backend
 
-Express 5 REST API with Mongoose and MongoDB persistence.
+An Express 5 API backed by MongoDB, with Mongoose handling the task model.
 
-## Setup
+## Running locally
 
-Use Node.js 22+ and MongoDB locally or Atlas. From the repository root:
+You’ll need Node.js 22 or newer and a MongoDB connection. From the repository root:
 
 ```sh
 npm ci
 cp backend/.env.example backend/.env
+```
+
+Set `MONGODB_URI` in `backend/.env`. For a local database, the example uses:
+
+```text
+mongodb://127.0.0.1:27017/todo_app
+```
+
+For Atlas, create a database user, allow your machine’s IP under Network Access and copy the `mongodb+srv://` connection string into `.env`. URL-encode any special characters in the username or password. Keep this file out of Git.
+
+Then start the API:
+
+```sh
 npm run dev -w backend
 ```
 
-Configure `MONGODB_URI` in `backend/.env`. The local default is `mongodb://127.0.0.1:27017/todo_app`. For Atlas, create a database user, allow your machine's IP in Network Access, and use the Atlas `mongodb+srv://` connection string with URL-encoded credentials. Keep credentials out of Git. `PORT` defaults to 3001.
+The default port is 3001; set `PORT` to change it. The server connects to MongoDB before it starts listening. If the URI is missing or the connection fails, it exits with an error.
 
-The server refuses to start without a URI or a successful database connection. SIGINT/SIGTERM close the HTTP server and database connection. For production use `npm start` from the root; a previously built frontend is served if present.
+For production, run `npm start` from the root. Express also serves `frontend/dist` if you’ve built the frontend. SIGINT and SIGTERM close the server and database connection.
 
-## REST API
+## API
 
-| Method | Endpoint | Request / response |
+| Method | Endpoint | Result |
 | --- | --- | --- |
-| GET | `/api/todos` | 200, array newest first |
-| POST | `/api/todos` | `{ "title": "Task", "description": "Optional" }`; 201, task |
-| PUT | `/api/todos/:id` | Required title and optional description; 200, updated task |
-| PATCH | `/api/todos/:id/done` | No body; 200, task with toggled status |
-| DELETE | `/api/todos/:id` | 204, no body |
+| GET | `/api/todos` | All tasks, newest first (200) |
+| POST | `/api/todos` | Creates and returns a task (201) |
+| PUT | `/api/todos/:id` | Updates and returns a task (200) |
+| PATCH | `/api/todos/:id/done` | Toggles completion and returns the task (200) |
+| DELETE | `/api/todos/:id` | Deletes the task (204, no body) |
 
-Task fields: `_id`, `title`, `description`, `done`, `createdAt`, `updatedAt`. Titles and descriptions are trimmed. Title must be 1–120 characters after trimming; description must be a string of up to 2,000 characters. Omitting description on PUT resets it to an empty string. Clients cannot update completion through PUT or inject arbitrary model fields. Completion uses an atomic pipeline update.
+POST and PUT accept:
 
-Errors return `{ "error": "Readable message" }`: 400 for malformed JSON, invalid fields or IDs, 404 for missing tasks/routes, 413 for oversized requests, 500 for unexpected errors. Internal errors are logged server-side without exposing details in responses.
+```json
+{
+  "title": "Plan the week",
+  "description": "Optional details"
+}
+```
+
+The title is required and must contain 1–120 characters after trimming. Description is optional and can contain up to 2,000 characters. Leaving it out of a PUT request clears the saved description. Both fields are trimmed before saving.
+
+Returned tasks contain `_id`, `title`, `description`, `done`, `createdAt` and `updatedAt`. PUT only accepts title and description; completion changes use the PATCH route. The toggle happens in one MongoDB update to avoid losing changes when requests overlap.
+
+Errors use this format:
+
+```json
+{ "error": "Readable message" }
+```
+
+Invalid fields, malformed JSON and invalid IDs return 400. Missing tasks or API routes return 404, oversized bodies return 413, and unexpected errors return 500. Internal error details stay in the server logs.
 
 ## Tests
+
+From the repository root:
 
 ```sh
 npm test
 ```
 
-Tests download a MongoDB binary on their first run, start a temporary isolated MongoDB process, and use Supertest. No production URI is read. Coverage includes CRUD/persistence, field validation, malformed JSON, request-size limits, missing IDs, status preservation and concurrent toggles. Internet access is required for the first binary download.
+The tests use Supertest and a temporary MongoDB process. They don’t use your configured database. The first run needs internet access to download the MongoDB binary.
 
-## Assumptions and limitations
+The suite checks CRUD and persistence, rejected input, missing tasks, request-size limits, preservation of completion status during edits and concurrent toggles.
 
-No authentication, rate limiting, task ownership or pagination. All users share one list. Use a trusted local environment for this exercise. Development accesses the API through the Vite proxy; production serves both applications from Express. No separate-origin CORS configuration is included.
+## Limits
+
+This is a shared task list without authentication, ownership, rate limiting or pagination. It’s intended for the assignment’s local setup. Vite proxies API requests during development; Express serves both parts in production. Separate-origin hosting would need CORS configuration.

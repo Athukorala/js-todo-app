@@ -7,12 +7,14 @@ if (!uri) {
   process.exit(1);
 }
 try {
+  // Wait for the database before accepting requests.
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
   const server = app.listen(process.env.PORT || 3001, () => console.log(`API listening on port ${process.env.PORT || 3001}`));
   let closing = false;
   async function shutdown() {
     if (closing) return;
     closing = true;
+    // Give active requests time to finish, but do not wait forever on shutdown.
     const timer = setTimeout(() => process.exit(1), 10000).unref();
     server.close(async () => { await mongoose.disconnect(); clearTimeout(timer); process.exit(0); });
   }

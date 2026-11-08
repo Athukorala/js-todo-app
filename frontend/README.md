@@ -1,31 +1,46 @@
 # Frontend
 
-React 19 and Vite, using plain CSS and native fetch.
+The UI uses React 19, Vite and plain CSS. API requests use `fetch`.
 
-## Setup
+## Running locally
 
-From the repository root, use Node.js 22+:
+Use Node.js 22 or newer. From the repository root:
 
 ```sh
 npm ci
 npm run dev -w frontend
 ```
 
-Open http://localhost:5173. Run the backend separately with `npm run dev -w backend`, or run both with `npm run dev` from the root.
+Open http://localhost:5173. You’ll also need the backend running in another terminal:
 
-`npm run build -w frontend` writes `frontend/dist`. For production, build first and run `npm start` at the root: Express serves both frontend and API from http://localhost:3001.
+```sh
+npm run dev -w backend
+```
 
-Vite proxies `/api` to http://127.0.0.1:3001. If the backend port changes, update `vite.config.js`. There are no frontend secrets or environment variables.
+Or use `npm run dev` at the root to start both together. The backend README covers the database setup.
 
-## Behavior
+Vite forwards `/api` requests to http://127.0.0.1:3001. If you change the backend port, update the proxy in `vite.config.js` too. The frontend doesn’t need an `.env` file.
 
-- Add a required title and optional description; whitespace-only titles are rejected.
-- Edit through the same form, or cancel without saving.
-- Toggle completion optimistically, with a rollback and error message on failure.
-- Delete after confirmation; search title/description and filter by status.
-- Loading, empty and error states; retry via Refresh list.
-- Responsive layout, labeled inputs, keyboard focus styles, live status announcements and reduced-motion support.
+## Building
 
-## Assumptions and limitations
+```sh
+npm run build -w frontend
+```
 
-A shared list without login, pagination or offline support. All tasks load at once; filtering is client-side. Delete has confirmation but no undo. Failed saves preserve form content. The UI disables conflicting actions while saving. API integration tests run via root `npm test`.
+This writes the build to `frontend/dist`. Run `npm start` at the repository root to serve it through Express at http://localhost:3001.
+
+## Using the app
+
+Add a title and, if needed, a description. Edit opens the task in the same form; Cancel leaves the saved task alone. Blank or whitespace-only titles aren’t accepted.
+
+The checkbox updates straight away and goes back if saving fails. Other saves wait for a response from the API. Failed saves keep your form content so you can try again. Delete asks for confirmation.
+
+Search checks both titles and descriptions. The All, Active and Completed buttons filter the loaded tasks. Loading, empty and error messages appear in the list area, with a Refresh list button when a request fails.
+
+The layout adapts to smaller screens. Inputs have labels, keyboard focus is visible, status changes have live announcements, and animations respect reduced-motion settings.
+
+## Limits and checks
+
+There’s no login, offline support, pagination or delete undo. Everyone using the same backend sees the same list. Conflicting actions are disabled while a save is in progress.
+
+Run `npm test` from the root for the API integration tests. Browser interaction checks still need to be done manually.

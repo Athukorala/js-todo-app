@@ -9,6 +9,7 @@ export const app = express();
 app.use(helmet());
 app.use(express.json({ limit: '16kb' }));
 
+// Pick the editable fields explicitly so clients cannot set done or timestamps here.
 function fields(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
   const { title, description = '' } = body;
@@ -36,7 +37,7 @@ app.put('/api/todos/:id', async (req, res) => {
   res.json(todo);
 });
 app.patch('/api/todos/:id/done', async (req, res) => {
-  // Pipeline update toggles atomically, even when requests arrive concurrently.
+  // Toggle in MongoDB so two requests cannot both read and overwrite the same status.
   const todo = await Todo.findByIdAndUpdate(req.params.id, [{ $set: { done: { $not: ['$done'] } } }], { new: true });
   if (!todo) return res.status(404).json({ error: 'This task no longer exists. Refresh your list.' });
   res.json(todo);
@@ -47,6 +48,7 @@ app.delete('/api/todos/:id', async (req, res) => {
   res.status(204).end();
 });
 app.use('/api', (_req, res) => res.status(404).json({ error: 'API endpoint not found.' }));
+// In development Vite serves the UI; a production build is served from here.
 const client = fileURLToPath(new URL('../../frontend/dist/', import.meta.url));
 if (existsSync(client)) {
   app.use(express.static(client));

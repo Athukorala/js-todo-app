@@ -6,6 +6,7 @@ async function api(path = '', options = {}) {
   const response = await fetch(`/api/todos${path}`, {
     ...options, headers: { 'Content-Type': 'application/json' },
   });
+  // DELETE succeeds without a JSON response body.
   if (response.status === 204) return null;
   const data = await response.json().catch(() => null);
   if (!response.ok) throw new Error(data?.error || 'Could not reach your tasks. Please try again.');
@@ -25,6 +26,7 @@ function App() {
   const [busy, setBusy] = useState(new Set());
   const [announcement, setAnnouncement] = useState('');
   const titleInput = useRef(null);
+  // A ref blocks repeat clicks immediately, before React renders the disabled button.
   const locks = useRef(new Set());
 
   async function load() {
@@ -51,6 +53,7 @@ function App() {
   async function mutate(todo, action) {
     if (locks.current.has(todo._id)) return;
     locks.current.add(todo._id); setBusy(new Set(locks.current)); setError('');
+    // Show checkbox changes right away; creates, edits and deletes wait for the API.
     const toggling = action === 'toggle';
     if (toggling) setTodos(items => items.map(t => t._id === todo._id ? { ...t, done: !t.done } : t));
     try {
@@ -59,6 +62,7 @@ function App() {
       if (!toggling && editing === todo._id) reset();
       setAnnouncement(toggling ? 'Task status updated.' : 'Task deleted.');
     } catch (e) {
+      // Restore this task without discarding changes to other tasks.
       if (toggling) setTodos(items => items.map(t => t._id === todo._id ? todo : t));
       setError(e.message);
     } finally { locks.current.delete(todo._id); setBusy(new Set(locks.current)); }

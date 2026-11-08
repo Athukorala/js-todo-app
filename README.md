@@ -1,51 +1,63 @@
-# Daylist — TODO app
+# Daylist
 
-A small full-stack task manager built with React, Express and MongoDB. Create, edit, complete and delete tasks, with search, status filters and a completion indicator. npm workspaces keep both applications in one repository.
+A TODO app built with React, Express and MongoDB. You can add tasks, edit their details, mark them as done and delete them. There’s also a search box, status filters and a progress indicator.
 
-## Quick start
+## Getting started
 
-Requires Node.js 22+ and a running MongoDB instance (local or Atlas).
+You’ll need Node.js 22 or newer and either a local MongoDB instance or an Atlas connection.
+
+From the project root:
 
 ```sh
 npm ci
 cp backend/.env.example backend/.env
-# Edit backend/.env to set your MongoDB connection URI.
+```
+
+Set `MONGODB_URI` in `backend/.env`, then start the app:
+
+```sh
 npm run dev
 ```
 
-Open http://localhost:5173. Vite proxies `/api` to Express on port 3001. The backend connects to MongoDB before accepting requests. No sample tasks are inserted.
+Open http://localhost:5173. This starts both servers: Vite handles the frontend and forwards API requests to Express on port 3001. The list starts empty, so add a task to try it out.
 
-For local MongoDB with Docker, if installed:
+If you have Docker installed, you can start a local database with:
 
 ```sh
 docker run -d --name daylist-mongo -p 127.0.0.1:27017:27017 -v daylist-data:/data/db mongo:8
 ```
 
-The named volume preserves data when the container is recreated. Later, use `docker start daylist-mongo`.
+The example connection string works with this setup. The volume keeps your tasks when the container is recreated. To start the same container later, run `docker start daylist-mongo`.
 
-## Commands
+## Useful commands
 
-| Command | Purpose |
+Run these from the project root:
+
+| Command | What it does |
 | --- | --- |
-| `npm run dev` | Start React and API with watch mode |
-| `npm test` | API integration tests against a real temporary MongoDB process |
-| `npm run build` | Build the React frontend |
-| `npm start` | Start Express, serving the built frontend and API on port 3001 |
+| `npm run dev` | Starts the frontend and backend in watch mode |
+| `npm test` | Runs the API tests with a temporary MongoDB database |
+| `npm run build` | Builds the frontend into `frontend/dist` |
+| `npm start` | Starts Express and serves the built frontend on port 3001 |
 
-Run `npm run build` before `npm start`. Production deployments must provide `MONGODB_URI` via environment variables; `.env` is for local development and is ignored by Git.
+For the production setup, run `npm run build` before `npm start`. Set `MONGODB_URI` in the deployment environment; don’t commit database credentials.
 
-## Architecture and choices
+## How it’s put together
 
-- `frontend/`: React with Vite. Component state is sufficient for this scope; HTTP calls use native fetch. No state-management or UI dependency is needed.
-- `backend/`: Express 5, Mongoose model, and explicit request validation. Async route failures go through a JSON error handler. Helmet adds standard HTTP security headers.
-- MongoDB stores title, optional description, completion status and timestamps. A pipeline update toggles completion atomically to avoid lost updates.
-- Same-origin API requests simplify deployment and avoid permissive CORS configuration. Express serves the production React build.
-- Completion changes update optimistically and roll back on failure. Creates and edits wait for server confirmation; delete requires confirmation. Per-task locks prevent duplicate mutations.
+The repo uses npm workspaces, with the React app in `frontend/` and the Express API in `backend/`. Each has its own [frontend README](frontend/README.md) or [backend README](backend/README.md) with setup details.
 
-See [frontend instructions](frontend/README.md) and [backend instructions](backend/README.md).
+React state handles the list and form, and `fetch` handles API calls. The app is small enough that a separate state library would add little here. The same form handles adding and editing tasks.
 
-## Scope and limitations
+The API validates incoming fields before passing them to Mongoose. MongoDB stores the task title, description, done status and timestamps. Completion toggles happen in one database update, so overlapping requests don’t overwrite each other’s changes.
 
-This is a single shared task list with no authentication, ownership, pagination or offline mode. Do not deploy it as a private multi-user task manager. Requests are limited to 16 KB; titles to 120 characters and descriptions to 2,000. Task times are stored but not displayed. Search and filters run on the loaded list. A toggle whose response is lost may require refreshing to reconcile with the database. Fonts load from Google Fonts with system fallbacks.
+Checking a task updates the screen immediately. If the request fails, the checkbox goes back and an error appears. Adding and editing wait for the server response, and deleting asks for confirmation first.
 
-AI assistance was used to implement and document this project. Review your assessment's AI policy and disclose that assistance; the brief warns that large amounts of AI-generated code may disqualify a submission.
+## Things to know
+
+- There’s one shared list, with no login or task ownership.
+- All tasks load together. Search and filters run in the browser; there’s no pagination.
+- Titles are limited to 120 characters and descriptions to 2,000. Request bodies are limited to 16 KB.
+- There’s no offline mode or delete undo. If a connection drops after a toggle reaches the server, refresh the list to check its saved status.
+- Fonts come from Google Fonts, with system fonts as a fallback.
+
+AI assistance was used for implementation and documentation.

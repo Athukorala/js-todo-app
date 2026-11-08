@@ -102,6 +102,30 @@ footer { display: flex; align-items: center; justify-content: space-between; fle
   .actions { flex-direction: row; }
   footer { margin-top: 30px; }
 }
+/* Keep feedback quick and quiet so it does not get in the way of the list. */
+button, input:not([type=checkbox]), textarea {
+  transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.primary { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.primary:active:not(:disabled) { transform: translateY(1px); }
+input:not([type=checkbox]):hover, textarea:hover { border-color: #99ac91; }
+input:not([type=checkbox]):focus, textarea:focus { border-color: #618052; box-shadow: 0 0 0 3px #61805214; }
+.composer, .task { transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.composer.is-editing, .task.is-editing { border-color: #8ca87c; box-shadow: 0 0 0 2px #8ca87c16; }
+.task { animation: task-enter .2s ease-out; }
+.task:hover { border-color: #b8c8af; }
+.checkbox { transition: background-color .16s ease, border-color .16s ease; }
+.checkbox:checked::after { animation: check-in .15s ease-out; }
+.task-tag, .task h3 { transition: color .2s ease, background-color .2s ease; }
+.empty, .error { animation: task-enter .2s ease-out; }
+.spinner { width: 14px; height: 14px; border: 2px solid #ffffff60; border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+.notice-region { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 10; width: max-content; max-width: calc(100vw - 32px); }
+.notice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #c7d7bd; border-radius: 8px; background: #fafff5; color: #36512d; box-shadow: 0 4px 20px #29352f16; font-size: 14px; animation: task-enter .2s ease-out; }
+.notice > span { color: #527d3e; }
+.notice button { border: 0; background: transparent; color: #576950; padding: 2px 5px; font-size: 20px; line-height: 1; }
+@keyframes task-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes check-in { from { transform: scale(.6); } to { transform: scale(1); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
 }

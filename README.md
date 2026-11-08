@@ -42,7 +42,7 @@ Run `npm run build` before `npm start`. Production deployments must provide `MON
 - Same-origin API requests simplify deployment and avoid permissive CORS configuration. Express serves the production React build.
 - Completion changes update optimistically and roll back on failure. Creates and edits wait for server confirmation; delete requires confirmation. Per-task locks prevent duplicate mutations.
 
-See [frontend instructions](frontend/README.md), [backend instructions](backend/README.md) and [submission checklist](SUBMISSION.md).
+See [frontend instructions](frontend/README.md) and [backend instructions](backend/README.md).
 
 ## Scope and limitations
 

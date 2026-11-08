@@ -28,4 +28,4 @@ Vite proxies `/api` to http://127.0.0.1:3001. If the backend port changes, updat
 
 ## Assumptions and limitations
 
-A shared list without login, pagination or offline support. All tasks load at once; filtering is client-side. Delete has confirmation but no undo. Failed saves preserve form content. The UI disables conflicting actions while saving. Browser interaction checks are described in `SUBMISSION.md`; API integration tests run via root `npm test`.
+A shared list without login, pagination or offline support. All tasks load at once; filtering is client-side. Delete has confirmation but no undo. Failed saves preserve form content. The UI disables conflicting actions while saving. API integration tests run via root `npm test`.

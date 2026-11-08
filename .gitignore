@@ -5,3 +5,11 @@ dist/
 !.env.example
 .DS_Store
 coverage/
+
+# Local assessment notes and private files
+SUBMISSION.md
+VERIFICATION.md
+PRIVATE.md
+private/
+*.local
+*.local.*

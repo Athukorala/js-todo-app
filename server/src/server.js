@@ -3,7 +3,7 @@ import { app } from './app.js';
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  console.error('MONGODB_URI is required. Copy backend/.env.example to backend/.env and configure MongoDB.');
+  console.error('MONGODB_URI is required. Copy server/.env.example to server/.env and configure MongoDB.');
   process.exit(1);
 }
 try {

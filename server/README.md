@@ -8,10 +8,10 @@ You’ll need Node.js 22 or newer and a MongoDB connection. From the repository 
 
 ```sh
 npm ci
-cp backend/.env.example backend/.env
+cp server/.env.example server/.env
 ```
 
-Set `MONGODB_URI` in `backend/.env`. For a local database, the example uses:
+Set `MONGODB_URI` in `server/.env`. For a local database, the example uses:
 
 ```text
 mongodb://127.0.0.1:27017/todo_app
@@ -22,12 +22,12 @@ For Atlas, create a database user, allow your machine’s IP under Network Acces
 Then start the API:
 
 ```sh
-npm run dev -w backend
+npm run dev -w server
 ```
 
 The default port is 3001; set `PORT` to change it. The server connects to MongoDB before it starts listening. If the URI is missing or the connection fails, it exits with an error.
 
-For production, run `npm start` from the root. Express also serves `frontend/dist` if you’ve built the frontend. SIGINT and SIGTERM close the server and database connection.
+For production, run `npm start` from the root. Express also serves `client/dist` if you’ve built the frontend. SIGINT and SIGTERM close the server and database connection.
 
 ## API
 
@@ -50,7 +50,20 @@ POST and PUT accept:
 
 The title is required and must contain 1–120 characters after trimming. Description is optional and can contain up to 2,000 characters. Leaving it out of a PUT request clears the saved description. Both fields are trimmed before saving.
 
-Returned tasks contain `_id`, `title`, `description`, `done`, `createdAt` and `updatedAt`. PUT only accepts title and description; completion changes use the PATCH route. The toggle happens in one MongoDB update to avoid losing changes when requests overlap.
+A saved task looks like this in an API response:
+
+```json
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "title": "Plan the week",
+  "description": "Optional details",
+  "done": false,
+  "createdAt": "2026-11-08T06:00:00.000Z",
+  "updatedAt": "2026-11-08T06:00:00.000Z"
+}
+```
+
+Mongoose creates the ObjectId and manages both timestamps. The API serializes the ID and dates as strings. PUT only accepts title and description; completion changes use the PATCH route. The toggle happens in one MongoDB update to avoid losing changes when requests overlap.
 
 Errors use this format:
 

@@ -8,13 +8,13 @@ Use Node.js 22 or newer. From the repository root:
 
 ```sh
 npm ci
-npm run dev -w frontend
+npm run dev -w client
 ```
 
 Open http://localhost:5173. You’ll also need the backend running in another terminal:
 
 ```sh
-npm run dev -w backend
+npm run dev -w server
 ```
 
 Or use `npm run dev` at the root to start both together. The backend README covers the database setup.
@@ -24,10 +24,10 @@ Vite forwards `/api` requests to http://127.0.0.1:3001. If you change the backen
 ## Building
 
 ```sh
-npm run build -w frontend
+npm run build -w client
 ```
 
-This writes the build to `frontend/dist`. Run `npm start` at the repository root to serve it through Express at http://localhost:3001.
+This writes the build to `client/dist`. Run `npm start` at the repository root to serve it through Express at http://localhost:3001.
 
 ## Using the app
 

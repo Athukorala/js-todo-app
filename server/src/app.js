@@ -49,7 +49,7 @@ app.delete('/api/todos/:id', async (req, res) => {
 });
 app.use('/api', (_req, res) => res.status(404).json({ error: 'API endpoint not found.' }));
 // In development Vite serves the UI; a production build is served from here.
-const client = fileURLToPath(new URL('../../frontend/dist/', import.meta.url));
+const client = fileURLToPath(new URL('../../client/dist/', import.meta.url));
 if (existsSync(client)) {
   app.use(express.static(client));
   app.get('/{*path}', (_req, res) => res.sendFile(`${client}/index.html`));

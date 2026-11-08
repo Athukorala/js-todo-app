@@ -10,10 +10,10 @@ From the project root:
 
 ```sh
 npm ci
-cp backend/.env.example backend/.env
+cp server/.env.example server/.env
 ```
 
-Set `MONGODB_URI` in `backend/.env`, then start the app:
+Set `MONGODB_URI` in `server/.env`, then start the app:
 
 ```sh
 npm run dev
@@ -37,14 +37,27 @@ Run these from the project root:
 | --- | --- |
 | `npm run dev` | Starts the frontend and backend in watch mode |
 | `npm test` | Runs the API tests with a temporary MongoDB database |
-| `npm run build` | Builds the frontend into `frontend/dist` |
+| `npm run build` | Builds the frontend into `client/dist` |
 | `npm start` | Starts Express and serves the built frontend on port 3001 |
 
 For the production setup, run `npm run build` before `npm start`. Set `MONGODB_URI` in the deployment environment; don’t commit database credentials.
 
 ## How it’s put together
 
-The repo uses npm workspaces, with the React app in `frontend/` and the Express API in `backend/`. Each has its own [frontend README](frontend/README.md) or [backend README](backend/README.md) with setup details.
+```text
+todo-app/
+├── client/          # React frontend
+│   ├── src/
+│   └── README.md
+├── server/          # Express API and MongoDB model
+│   ├── src/
+│   ├── test/
+│   └── README.md
+├── package.json     # Workspace scripts
+└── README.md
+```
+
+The repo uses npm workspaces, with the React app in `client/` and the Express API in `server/`. Each has its own [frontend README](client/README.md) or [backend README](server/README.md) with setup details.
 
 React state handles the list and form, and `fetch` handles API calls. The app is small enough that a separate state library would add little here. The same form handles adding and editing tasks.
 

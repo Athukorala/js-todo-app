@@ -84,7 +84,7 @@ function App() {
           <div className="list-footer"><span>{todos.length - completed} tasks left</span><span>Every small step counts <span aria-hidden="true">↗</span></span></div>
         </section>
       </div>
-    </main><footer>MADE FOR A MORE MINDFUL DAY <span>✧</span> KEEP IT SIMPLE. KEEP GOING.</footer><div className="sr-only" role="status">{announcement}</div>
+    </main><footer>MADE FOR A MORE MINDFUL DAY <span aria-hidden="true">✧</span> KEEP IT SIMPLE. KEEP GOING.<small className="developer-credit">Developed by Tharindu Athukorala</small></footer><div className="sr-only" role="status">{announcement}</div>
   </div>;
 }
 createRoot(document.getElementById('root')).render(<App/>);

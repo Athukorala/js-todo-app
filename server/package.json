@@ -1,0 +1,21 @@
+{
+  "name": "@daylist/api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "mongoose": "^8.24.8"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.3.0",
+    "supertest": "^7.1.4"
+  }
+}
